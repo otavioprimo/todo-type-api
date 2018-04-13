@@ -11,7 +11,7 @@ class Mail {
     sendMail() {
 
         let mailOptions = {
-            from: "portalband@band.com.br",
+            from: "callofbreja@gmail.com",
             to: this.to,
             subject: this.subject,
             html: this.message
@@ -27,7 +27,6 @@ class Mail {
             },
             tls: { rejectUnauthorized: false }
         });
-
 
         // console.log(mailOptions);
 

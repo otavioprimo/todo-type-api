@@ -1,4 +1,3 @@
-import { UserModel } from './UserModel';
 import * as Sequelize from 'sequelize';
 import { genSaltSync, hashSync, compareSync } from 'bcryptjs';
 
@@ -9,6 +8,7 @@ export interface UserAttributes {
     id?: number;
     name?: string;
     email?: string;
+    username?: string;
     password?: string;
     email_confirmed?: boolean;
     photo?: string;
