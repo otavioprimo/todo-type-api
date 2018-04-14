@@ -47,6 +47,13 @@ exports.default = (sequelize, DataTypes) => {
                 name: 'user'
             }
         });
+        Task.belongsTo(models.User, {
+            foreignKey: {
+                allowNull: true,
+                field: 'friend',
+                name: 'friend'
+            }
+        });
     };
     return Task;
 };

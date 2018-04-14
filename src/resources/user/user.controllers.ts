@@ -8,6 +8,7 @@ import Mail from '../../services/mail';
 class UserController implements IUserController {
 
     public testeEmail(req: Request, res: Response): void {
+        res.send("Hello World");
         // req.checkQuery("email").exists().isEmail();
         // var errors = req.validationErrors();
 

@@ -33,9 +33,12 @@ if (!db) {
             db[model['name']] = model;
         });
 
-    // db.User
-    // db.Post
-    // db.Comment
+    db.TokenResetPassword
+    db.User
+    db.FriendsList
+    db.FriendsInvitation
+    db.ConfirmEmail
+    db.Task
 
     Object.keys(db).forEach((modelName: string) => {
         if (db[modelName].associate) {

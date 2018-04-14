@@ -7,6 +7,7 @@ import { ModelsInterface } from '../interfaces/ModelsInterface';
 export interface TaskAttributes {
     id?: number;
     user?: number;
+    friend?: number;
     title?: string;
     description?: string;
     share_token?: string;
@@ -68,6 +69,14 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
                 name: 'user'
             }
         });
+
+        Task.belongsTo(models.User, {
+            foreignKey: {
+                allowNull: true,
+                field: 'friend',
+                name: 'friend'
+            }
+        })
     };
 
     return Task;

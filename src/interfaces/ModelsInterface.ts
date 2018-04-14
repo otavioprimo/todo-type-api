@@ -1,9 +1,15 @@
+import { TokenResetPasswordModel } from './../models/TokenResetPasswordModel';
+import { ConfirmEmailModel } from './../models/ConfirmEmailModel';
 import { FriendsInvitationModel } from './../models/FriendsInvitationModel';
 import { FriendsListModel } from './../models/FriendsListModel';
 import { UserModel } from './../models/UserModel';
+import { TaskModel } from '../models/TasksModel';
 
 export interface ModelsInterface {
-    User: UserModel;
+    ConfirmEmail: ConfirmEmailModel;
     FriendList: FriendsListModel;
-    FriendsInvitation:FriendsInvitationModel;
+    FriendsInvitation: FriendsInvitationModel;
+    Task: TaskModel;
+    TokenResetPassword: TokenResetPasswordModel;
+    User: UserModel;
 }

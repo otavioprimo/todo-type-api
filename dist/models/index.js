@@ -21,9 +21,12 @@ if (!db) {
         const model = sequelize.import(path.join(__dirname, file));
         db[model['name']] = model;
     });
-    // db.User
-    // db.Post
-    // db.Comment
+    db.TokenResetPassword;
+    db.User;
+    db.FriendsList;
+    db.FriendsInvitation;
+    db.ConfirmEmail;
+    db.Task;
     Object.keys(db).forEach((modelName) => {
         if (db[modelName].associate) {
             db[modelName].associate(db);

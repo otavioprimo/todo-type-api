@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class UserController {
     testeEmail(req, res) {
+        res.send("Hello World");
         // req.checkQuery("email").exists().isEmail();
         // var errors = req.validationErrors();
         // if (errors) {
