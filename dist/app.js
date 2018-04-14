@@ -27,7 +27,7 @@ class App {
         // );
     }
     routes() {
-        this.app.use('/sasad', (req, res) => { res.send("Olá Marilene"); });
+        this.app.use('/hello', (req, res) => { res.send("Olá Marilene"); });
         this.app.use('/api/user', user_routes_1.default);
     }
 }

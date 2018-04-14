@@ -39,7 +39,7 @@ if (isProduction) {
     //Termina de compilar e fecha as tarefas
     gulp.task('default', ['build'], () => {
         setTimeout(() => {
-            console.log(`Build for ${env}completed successfully!`);
+            console.log(`Build for ${env} completed successfully!`);
         }, 500);
     });
 } else {

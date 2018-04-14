@@ -1,5 +1,5 @@
 import app from "./app";
-import db from './Models';
+import db from './models';
 
 import * as http from 'http';
 
