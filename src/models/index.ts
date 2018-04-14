@@ -5,7 +5,8 @@ import * as Sequelize from 'sequelize';
 
 const basename: string = path.basename(module.filename);
 const env: string = process.env.NODE_ENV || 'development';
-let config = require(path.resolve(`${__dirname}./../config/config.json`))[env];
+
+let config = require(path.resolve(`${__dirname}./../config/config.json`))[env.trim()];
 let db = null;
 
 if (!db) {
@@ -32,9 +33,9 @@ if (!db) {
             db[model['name']] = model;
         });
 
-    db.User
-    db.Post
-    db.Comment
+    // db.User
+    // db.Post
+    // db.Comment
 
     Object.keys(db).forEach((modelName: string) => {
         if (db[modelName].associate) {

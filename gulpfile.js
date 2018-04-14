@@ -5,6 +5,8 @@ const nodemon = require("gulp-nodemon");
 const argv = require('yargs').argv;
 const ts = require('gulp-typescript');
 
+const env = process.env.NODE_ENV;
+
 //Pega o argumento passado no comando listado no package.json
 var isProduction = (argv.prod === undefined) ? false : true;
 
@@ -37,7 +39,7 @@ if (isProduction) {
     //Termina de compilar e fecha as tarefas
     gulp.task('default', ['build'], () => {
         setTimeout(() => {
-            console.log("Build for production completed successfully!");
+            console.log(`Build for ${env}completed successfully!`);
         }, 500);
     });
 } else {

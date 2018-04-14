@@ -1,5 +1,7 @@
 import { Server } from "http";
 
+const env: string = process.env.NODE_ENV || 'development';
+
 export const normalizePort = (val: number | string): number | string | boolean => {
     let port: number = (typeof val === 'string') ? parseInt(val) : val;
     if (isNaN(port)) return val;
@@ -28,9 +30,14 @@ export const onError = (server: Server) => {
 }
 
 export const onListening = (server: Server) => {
+    let capitalizeEnv = capitalize(env.trim());
     return (): void => {
         let addr = server.address();
         let bind = (typeof addr === 'string') ? `pipe ${addr}` : `port ${addr.port}`;
-        console.log(`Listening at ${bind}...`);
+        console.log(`\nListening at ${bind}... \n${capitalizeEnv} enviroment`);
     }
 }
+
+function capitalize(s){
+    return s.toLowerCase().replace( /\b./g, function(a){ return a.toUpperCase(); } );
+};
