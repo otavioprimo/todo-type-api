@@ -25,14 +25,14 @@ class App {
         this.app.use(validator());
         this.app.use(morgan('dev'));
 
-        this.app.use('/',
+        // this.app.use('/',
 
-            (req, res, next) => {
-                req['context'] = {};
-                req['context'].db = db;
-                next();
-            }
-        );
+            // (req, res, next) => {
+            //     req['context'] = {};
+            //     req['context'].db = db;
+            //     next();
+            // }
+        // );
     }
 
     private routes() {

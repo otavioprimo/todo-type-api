@@ -1,4 +1,4 @@
-import { FriendsInvitationModel } from './../models/FriendsInvitation';
+import { FriendsInvitationModel } from './../models/FriendsInvitationModel';
 import { FriendsListModel } from './../models/FriendsListModel';
 import { UserModel } from './../models/UserModel';
 
