@@ -36,7 +36,7 @@ class App {
     }
 
     private routes() {
-
+        this.app.use('/hello',(req,res)=>{res.send("Olá Marilene")});
         this.app.use('/api/user', userRoute);
     }
 }
