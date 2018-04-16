@@ -18,6 +18,11 @@ exports.default = (sequelize, DataTypes) => {
             allowNull: false,
             unique: true
         },
+        username: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true
+        },
         email_confirmed: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
@@ -39,6 +44,14 @@ exports.default = (sequelize, DataTypes) => {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: 1
+        },
+        onesignal_id: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        google_id: {
+            type: DataTypes.STRING,
+            allowNull: true
         }
     }, {
         tableName: 'users',

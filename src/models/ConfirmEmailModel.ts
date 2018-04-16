@@ -1,8 +1,10 @@
 import * as Sequelize from 'sequelize';
-import * as uuid from 'uuid/v4';
+import * as UIDGenerator from 'uid-generator';
 
 import { BaseModelInterface } from './../interfaces/BaseModelInterface';
 import { ModelsInterface } from '../interfaces/ModelsInterface';
+
+const uidgen = new UIDGenerator();
 
 export interface ConfirmEmailAttributes {
     id?: number;
@@ -45,8 +47,8 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
                 tableName: 'confirm_email',
                 hooks: {
                     beforeCreate: (confirmEmail: ConfirmEmailInstance, options: Sequelize.CreateOptions): void => {
-                        const token = uuid();
-                        confirmEmail.token = token;
+                        uidgen.generate()
+                            .then(token => confirmEmail.token = token);
                     }
                 }
             });

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const uuid = require("uuid/v4");
+const UIDGenerator = require("uid-generator");
+const uidgen = new UIDGenerator();
 exports.default = (sequelize, DataTypes) => {
     const TokenResetPassword = sequelize.define('TokenResetPassword', {
         id: {
@@ -26,8 +27,8 @@ exports.default = (sequelize, DataTypes) => {
         tableName: 'token_reset_password',
         hooks: {
             beforeCreate: (tokenResetPassword, options) => {
-                const token = uuid();
-                tokenResetPassword.token = token;
+                uidgen.generate()
+                    .then(token => tokenResetPassword.token = token);
             }
         }
     });

@@ -2,6 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const user_controllers_1 = require("./user.controllers");
 const express_1 = require("express");
+const authRoute_1 = require("../authRoute");
 const router = express_1.Router();
-router.get('/', user_controllers_1.default.testeEmail);
+router.get('/', authRoute_1.default, user_controllers_1.default.getPerfilById);
+router.post('/', user_controllers_1.default.cadastrar);
+router.post('/login', user_controllers_1.default.login);
+router.get('/:username', authRoute_1.default, user_controllers_1.default.getByUsername);
+router.get('/search/username', authRoute_1.default, user_controllers_1.default.searchByUsername);
 exports.default = router;

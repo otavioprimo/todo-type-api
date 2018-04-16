@@ -14,6 +14,7 @@ export interface UserAttributes {
     photo?: string;
     status?: boolean;
     onesignal_id?: string;
+    google_id?: string;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -43,6 +44,11 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
                 allowNull: false,
                 unique: true
             },
+            username: {
+                type: DataTypes.STRING,
+                allowNull: false,
+                unique: true
+            },
             email_confirmed: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
@@ -64,6 +70,14 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
                 defaultValue: 1
+            },
+            onesignal_id: {
+                type: DataTypes.STRING,
+                allowNull: true
+            },
+            google_id: {
+                type: DataTypes.STRING,
+                allowNull: true
             }
         }, {
                 tableName: 'users',

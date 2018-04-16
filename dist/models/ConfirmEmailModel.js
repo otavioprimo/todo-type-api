@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const uuid = require("uuid/v4");
+const UIDGenerator = require("uid-generator");
+const uidgen = new UIDGenerator();
 exports.default = (sequelize, DataTypes) => {
     const ConfirmEmail = sequelize.define('ConfirmEmail', {
         id: {
@@ -26,8 +27,8 @@ exports.default = (sequelize, DataTypes) => {
         tableName: 'confirm_email',
         hooks: {
             beforeCreate: (confirmEmail, options) => {
-                const token = uuid();
-                confirmEmail.token = token;
+                uidgen.generate()
+                    .then(token => confirmEmail.token = token);
             }
         }
     });
