@@ -16,6 +16,7 @@ export interface TaskAttributes {
     message?: string;
     shared_token?: string;
     public_id?: string;
+    isList?: boolean;
     status?: boolean;
     private?: boolean;
     expiration?: string;
@@ -67,6 +68,11 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
                 defaultValue: 1
+            },
+            isList: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: 0
             }
         }, {
                 tableName: 'tasks',
@@ -117,7 +123,7 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
                 field: 'friend',
                 name: 'friend'
             }
-        })
+        });
     };
 
     return Task;

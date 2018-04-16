@@ -43,6 +43,11 @@ exports.default = (sequelize, DataTypes) => {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: 1
+        },
+        isList: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: 0
         }
     }, {
         tableName: 'tasks',

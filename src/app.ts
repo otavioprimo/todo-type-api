@@ -8,7 +8,6 @@ import db from './models';
 import Mail from './services/mail';
 import userRoute from './resources/user/user.routes';
 import auth from './config/auth';
-
 class App {
 
     public app: express.Application;
@@ -29,8 +28,8 @@ class App {
     }
 
     private routes() {
-        this.app.use('/hello',(req,res)=>{res.send("Olá Marilene")});
-        this.app.use('/api/user', userRoute);
+        this.app.use('/hello', (req, res) => { res.send("Olá Marilene") });
+        this.app.use('/api/v1/user', userRoute);
     }
 }
 

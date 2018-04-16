@@ -9,7 +9,7 @@ const server = http.createServer(app_1.default);
 const port = utils_1.normalizePort(process.env.port || 3000);
 //Delete All Tabled and Create Again | Only for Development
 let deleteTables = env.trim() === 'development' ? true : false;
-models_1.default.sequelize.sync({ force: false })
+models_1.default.sequelize.sync({ force: deleteTables })
     .then(() => {
     server.listen(port);
     server.on('error', utils_1.onError(server));

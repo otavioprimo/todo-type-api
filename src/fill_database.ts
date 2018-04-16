@@ -11,12 +11,6 @@ export class FillDatabase {
                 email: 'otavioprimo@gmail.com',
                 username: 'otavioprimo',
                 password: '5886630'
-            },
-            {
-                name: 'Perera',
-                email: 'perera@gmail.com',
-                username: 'perera',
-                password: '5886630'
             }
         ];
 
@@ -24,14 +18,7 @@ export class FillDatabase {
             {
                 title: "Sasad",
                 message: "Description Sasad Teste",
-                user: 1,
-                friend: 2
-            },
-            {
-                title: "Sasad",
-                message: "Description Sasad Teste",
-                user: 2,
-                friend: 1
+                user: 1
             }
         ]
 

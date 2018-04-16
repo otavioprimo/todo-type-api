@@ -23,7 +23,7 @@ class App {
     }
     routes() {
         this.app.use('/hello', (req, res) => { res.send("Olá Marilene"); });
-        this.app.use('/api/user', user_routes_1.default);
+        this.app.use('/api/v1/user', user_routes_1.default);
     }
 }
 exports.default = new App().app;

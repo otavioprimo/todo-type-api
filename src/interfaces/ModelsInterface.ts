@@ -1,3 +1,4 @@
+import { TaskCheckListModel } from './../models/TaskCheckListModel';
 import { TokenResetPasswordModel } from './../models/TokenResetPasswordModel';
 import { ConfirmEmailModel } from './../models/ConfirmEmailModel';
 import { FriendsInvitationModel } from './../models/FriendsInvitationModel';
@@ -12,4 +13,5 @@ export interface ModelsInterface {
     Task: TaskModel;
     TokenResetPassword: TokenResetPasswordModel;
     User: UserModel;
+    TaskCheckList: TaskCheckListModel;
 }
