@@ -62,7 +62,7 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
                 }
             },
             photo: {
-                type: DataTypes.BLOB({ length: 'long' }),
+                type: DataTypes.TEXT,
                 allowNull: true,
                 defaultValue: null
             },
@@ -85,6 +85,8 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
                     beforeCreate: (user: UserInstance, options: Sequelize.CreateOptions): void => {
                         const salt = genSaltSync();
                         user.password = hashSync(user.password, salt);
+
+                        user.photo = `https://api.adorable.io/avatar/80/${user.username}`;
                     },
                     beforeUpdate: (user: UserInstance, options: Sequelize.CreateOptions): void => {
                         if (user.changed('password')) {

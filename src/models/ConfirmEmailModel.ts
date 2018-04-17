@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
 import * as UIDGenerator from 'uid-generator';
+import * as moment from 'moment';
 
 import { BaseModelInterface } from './../interfaces/BaseModelInterface';
 import { ModelsInterface } from '../interfaces/ModelsInterface';
@@ -11,7 +12,7 @@ export interface ConfirmEmailAttributes {
     user?: number;
     token?: string;
     status?: boolean;
-    expiration?: string;
+    expiration?: moment.Moment;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -36,7 +37,7 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
             },
             expiration: {
                 type: DataTypes.DATE,
-                allowNull: false
+                allowNull: true
             },
             status: {
                 type: DataTypes.BOOLEAN,
@@ -47,8 +48,7 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
                 tableName: 'confirm_email',
                 hooks: {
                     beforeCreate: (confirmEmail: ConfirmEmailInstance, options: Sequelize.CreateOptions): void => {
-                        uidgen.generate()
-                            .then(token => confirmEmail.token = token);
+                        confirmEmail.expiration = moment().add(45, "hours");
                     }
                 }
             });
