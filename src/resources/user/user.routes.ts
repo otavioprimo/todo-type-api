@@ -11,5 +11,6 @@ router.get('/:username', tokenRequired, UserController.getByUsername);
 router.get('/search/username', tokenRequired, UserController.searchByUsername);
 router.post('/confirmar-email', UserController.confirmarEmail);
 router.post('/enviar-confirmar-email', tokenRequired, UserController.enviarConfirmarEmail);
+router.post('/enviar-recuperar-senha', tokenRequired, UserController.recuperarSenha);
 
 export default router;

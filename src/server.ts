@@ -5,6 +5,7 @@ import db from './models';
 import * as http from 'http';
 
 import { normalizePort, onError, onListening } from './utils/utils';
+import { Transaction } from 'sequelize';
 
 const env: string = process.env.NODE_ENV || 'development';
 const server = http.createServer(app);
@@ -19,7 +20,5 @@ db.sequelize.sync({ force: false })
         server.on('error', onError(server));
 
         server.on('listening', onListening(server));
-
-        // env.trim() === 'development' ? FillDatabase.fill() : "";
 
     });

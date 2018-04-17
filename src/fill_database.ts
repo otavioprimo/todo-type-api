@@ -1,37 +1,22 @@
 import { TaskAttributes } from './models/TasksModel';
 import { UserAttributes } from './models/UserModel';
 import db from './models';
-import { Transaction } from 'sequelize';
 
 export class FillDatabase {
-    static fill(): void {
-        let users: UserAttributes[] = [
-            {
-                name: 'Otávio Primo',
-                email: 'otavioprimo@gmail.com',
-                username: 'otavioprimo',
-                password: '5886630'
-            }
-        ];
+    fill(): void {
 
-        let tasks: TaskAttributes[] = [
-            {
-                title: "Sasad",
-                message: "Description Sasad Teste",
-                user: 1
-            }
-        ]
+        db.User.create({
+            name: 'Otávio Primo',
+            email: 'otavioprimo@gmail.com',
+            username: 'otavioprimo',
+            password: '5886630'
+        }).then(data => console.log(data));
 
-        users.forEach(element => {
-            db.sequelize.transaction((t: Transaction) => {
-                return db.User.create(element, { transaction: t });
-            })
-        });
 
-        tasks.forEach(element => {
-            db.sequelize.transaction((e: Transaction) => {
-                return db.Task.create(element, { transaction: e });
-            });
+        db.Task.create({
+            title: "Sasad",
+            message: "Description Sasad Teste",
+            user: 1
         });
     }
 }

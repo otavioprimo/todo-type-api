@@ -1,6 +1,6 @@
 import { ConfirmEmailInstance } from '../../models/ConfirmEmailModel';
 import { IUserController } from './user.interface';
-import { Op } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { Router, Request, Response } from 'express';
 import { UserAttributes, UserInstance } from './../../models/UserModel';
 
@@ -12,6 +12,7 @@ import * as HttpStatus from 'http-status-codes';
 import * as jwt from 'jsonwebtoken';
 import * as UIDGenerator from 'uid-generator';
 import * as moment from 'moment';
+import { TokenResetPasswordInstance } from '../../models/TokenResetPasswordModel';
 
 const uidgen = new UIDGenerator();
 class UserController implements IUserController {
@@ -80,6 +81,7 @@ class UserController implements IUserController {
             res.status(HttpStatus.BAD_REQUEST).json(errors);
             return;
         } else {
+
             //Verifica se o username já existe
             db.User.findOne({ where: { username: req.body.username } }).then(hasUser => {
                 if (hasUser)
@@ -91,24 +93,32 @@ class UserController implements IUserController {
                             res.status(HttpStatus.BAD_REQUEST).json({ erro: true, mensagem: "Usuário já existe" });
                         else {
                             //Cria a conta de usuário
-                            db.User.create({ email: req.body.email, username: req.body.username, name: req.body.name, password: req.body.senha, onesignal_id: req.body.onesignal_id })
-                                .then((user: UserInstance) => {
-                                    //Gera o token para o confirmar email
-                                    uidgen.generate().then(token_email => {
-                                        EnviarEmail.cadastro(req.body.email, req.body.name, token_email);
-                                        db.ConfirmEmail.create({ user: user.id, token: token_email })
+                            db.sequelize.transaction((t: Transaction) => {
+                                return db.User.create({
+                                    email: req.body.email,
+                                    username: req.body.username,
+                                    name: req.body.name,
+                                    password: req.body.senha,
+                                    onesignal_id: req.body.onesignal_id
+                                }, { transaction: t });
+                            }).then((user: UserInstance) => {
+                                //Gera o token para o confirmar email
+                                uidgen.generate().then(token_email => {
+                                    EnviarEmail.cadastro(req.body.email, req.body.name, token_email);
+                                    db.ConfirmEmail.create({ user: user.id, token: token_email })
 
-                                        //Envia o token de resposta
-                                        var token = jwt.sign({ id: user.id, email: user.email }, default_configs.jwt_token, {
-                                            expiresIn: '360d'
-                                        });
-                                        res.status(HttpStatus.OK).json({ error: false, token: token });
+                                    //Envia o token de resposta
+                                    var token = jwt.sign({ id: user.id, email: user.email }, default_configs.jwt_token, {
+                                        expiresIn: '360d'
                                     });
+                                    res.status(HttpStatus.OK).json({ error: false, token: token });
                                 });
+                            })
                         }
-                    })
+                    });
                 }
-            })
+            });
+
         }
     }
     login(req: Request, res: Response): void {
@@ -133,7 +143,9 @@ class UserController implements IUserController {
                             let isPassword = user.isPassword(user.password, req.body.senha);
 
                             if (isPassword) {
-                                user.update({ onesignal_id: req.body.onesignal_id });
+                                db.sequelize.transaction((t: Transaction) => {
+                                    return user.update({ onesignal_id: req.body.onesignal_id }, { transaction: t });
+                                });
                                 var token = jwt.sign({ id: user.id, email: user.email }, default_configs.jwt_token, {
                                     expiresIn: '360d'
                                 });
@@ -178,8 +190,63 @@ class UserController implements IUserController {
         throw new Error("Method not implemented.");
     }
     atualizarSenha(req: Request, res: Response): void {
-        throw new Error("Method not implemented.");
+        req.checkBody("old_password").exists().isLength({ min: 6, max: 20 });;
+        req.checkBody("password").exists().isLength({ min: 6, max: 20 });;
+        var errors = req.validationErrors();
+
+        if (errors) {
+            res.status(HttpStatus.BAD_REQUEST).json(errors);
+            return;
+        } else {
+            db.User.findById(req.user.id)
+                .then((user: UserInstance) => {
+                    let isPassword = user.isPassword(user.password, req.body.old_password);
+                    if (isPassword) {
+                        db.sequelize.transaction((t: Transaction) => {
+                            return user.update({ password: req.body.password });
+                        }).then(data => {
+                            res.status(HttpStatus.OK).json({ error: false, data: user, mensagem: "Atualizado com sucesso" });
+                        })
+                    } else {
+                        res.status(HttpStatus.OK).json({ error: true, mensagem: "Senha atual inválida" });
+                    }
+                });
+        }
     }
+
+    atualizarRecuperarSenha(req: Request, res: Response): void {
+        req.checkBody("token").exists();
+        req.checkBody("password").exists().isLength({ min: 6, max: 20 });;
+        var errors = req.validationErrors();
+
+        if (errors) {
+            res.status(HttpStatus.BAD_REQUEST).json(errors);
+            return;
+        } else {
+            db.TokenResetPassword.findOne({
+                where: {
+                    token: req.body.token,
+                    status: true,
+                    expiration: { [Op.gte]: moment().subtract(3, 'hours').toDate() }
+                }
+            })
+                .then((hasToken: TokenResetPasswordInstance) => {
+                    if (hasToken) {
+                        hasToken.update({ status: false }).then(resp => {
+                            db.sequelize.transaction((t: Transaction) => {
+                                return db.User.update({ password: req.body.password }, { where: { id: hasToken.user }, transaction: t });
+                            }).then(data => {
+                                res.send(HttpStatus.OK).json({ error: false, mensagem: "Senha Alterada com sucesso" });
+                            })
+                        });
+                    } else {
+                        res.status(HttpStatus.NOT_FOUND).json({ error: true, mensagem: "Token Inválido" });
+                        return;
+                    }
+                })
+        }
+    }
+
     confirmarEmail(req: Request, res: Response): void {
         req.checkBody("token").exists();
         var errors = req.validationErrors();
@@ -198,8 +265,12 @@ class UserController implements IUserController {
                 .then((hasToken: ConfirmEmailInstance) => {
                     if (hasToken) {
                         hasToken.update({ status: false }).then(resp => {
-                            res.send(HttpStatus.OK).json({ error: false, mensagem: "Email Confirmado com sucesso" });
-                        })
+                            db.sequelize.transaction((t: Transaction) => {
+                                return db.User.update({ email_confirmed: true }, { where: { id: hasToken.user }, transaction: t });
+                            }).then(data => {
+                                res.send(HttpStatus.OK).json({ error: false, mensagem: "Email Confirmado com sucesso" });
+                            })
+                        });
                     } else {
                         res.status(HttpStatus.NOT_FOUND).json({ error: true, mensagem: "Token Inválido" });
                         return;
@@ -207,21 +278,51 @@ class UserController implements IUserController {
                 })
         }
     }
+
     enviarConfirmarEmail(req: Request, res: Response): void {
         db.User.findById(req.user.id)
             .then((user: UserInstance) => {
 
                 uidgen.generate().then(token_email => {
                     EnviarEmail.cadastro(user.email, user.name, token_email);
-                    db.ConfirmEmail.create({ user: user.id, token: token_email });
-
-                    res.status(HttpStatus.OK).json({ error: false, mensagem: "Email enviado com sucesso, ele deverá chegar em instantes em sua caixa eletrônica" });
+                    db.sequelize.transaction((t: Transaction) => {
+                        return db.ConfirmEmail.create({ user: user.id, token: token_email }, { transaction: t });
+                    }).then(data => {
+                        res.status(HttpStatus.OK).json({ error: false, mensagem: "Email enviado com sucesso, ele deverá chegar em instantes em sua caixa eletrônica" });
+                    });
                 });
 
-            });
+            }).catch(err => {
+                res.status(HttpStatus.OK).json({ error: true, mensagem: "Não foi possível enviar o email" });
+            })
     }
+
     recuperarSenha(req: Request, res: Response): void {
-        throw new Error("Method not implemented.");
+        req.checkBody("email").exists().isEmail();
+        var errors = req.validationErrors();
+
+        if (errors) {
+            res.status(HttpStatus.BAD_REQUEST).json(errors);
+            return;
+        } else {
+            db.User.findOne({ where: { email: req.body.email } })
+                .then((user: UserInstance) => {
+                    if (user) {
+                        uidgen.generate().then(token => {
+                            EnviarEmail.recuperarSenha(user.email, user.name, token);
+                            db.sequelize.transaction((t: Transaction) => {
+                                return db.TokenResetPassword.create({ user: user.id, token: token }, { transaction: t });
+                            }).then(data => {
+                                res.status(HttpStatus.OK).json({ error: false, mensagem: "Email enviado com sucesso, ele deverá chegar em instantes em sua caixa eletrônica" });
+                            })
+                        });
+                    } else {
+                        res.status(HttpStatus.OK).json({ error: true, mensagem: "Email não cadastrado" });
+                    }
+                }).catch(err => {
+                    res.status(HttpStatus.OK).json({ error: true, mensagem: "Não foi possível enviar o email" });
+                })
+        }
     }
 }
 

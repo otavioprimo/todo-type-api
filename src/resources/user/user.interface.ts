@@ -10,6 +10,7 @@ export interface IUserController {
     confirmarEmail(req: Request, res: Response): void;
     enviarConfirmarEmail(req: Request, res: Response): void;
     recuperarSenha(req: Request, res: Response): void;
+    atualizarRecuperarSenha(req: Request, res: Response): void;
     getPerfilById(req: Request, res: Response): void;
     getUsuariosFiltro(req: Request, res: Response): void;
     getByUsername(req: Request, res: Response): void;
