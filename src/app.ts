@@ -4,6 +4,8 @@ import * as cors from 'cors';
 import * as validator from 'express-validator';
 import * as  fileUpload from 'express-fileupload';
 import * as morgan from 'morgan';
+import * as path from 'path';
+import * as mkdirp from 'mkdirp';
 
 import db from './models';
 import Mail from './services/mail';
@@ -20,6 +22,12 @@ class App {
     }
 
     private middleware(): void {
+        this.app.all('/*', (req, res, next) => {
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header("Access-Control-Allow-Headers", "X-Requested-With");
+            next();
+        });
+
         this.app.use(bodyParser.urlencoded({ extended: false }));
         this.app.use(bodyParser.json());
         this.app.use(cors());
@@ -30,6 +38,9 @@ class App {
     }
 
     private routes() {
+        mkdirp('./public/user/avatar', (err) => { });
+
+        this.app.use('/static', express.static(path.join(__dirname, '../public')));
         this.app.use('/hello', (req, res) => { res.send("Olá Marilene") });
         this.app.use('/api/v1/user', userRoute);
     }

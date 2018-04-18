@@ -8,7 +8,6 @@ import { UserAttributes, UserInstance } from './../../models/UserModel';
 import db from '../../models';
 import default_configs from "../../config/default_variables";
 import EnviarEmail from '../../services/send_email';
-import * as mkdirp from 'mkdirp';
 
 import * as HttpStatus from 'http-status-codes';
 import * as jwt from 'jsonwebtoken';
@@ -205,8 +204,6 @@ class UserController implements IUserController {
         }
     }
     atualizarFoto(req: Request, res: Response): void {
-        mkdirp('./public/user/avatar', (err) => { });
-
         if (!req.files) {
             res.status(HttpStatus.OK).json({ error: true, mensagem: "Sem arquivos para upload" });
             return;
