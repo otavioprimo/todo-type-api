@@ -2,6 +2,7 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 import * as validator from 'express-validator';
+import * as  fileUpload from 'express-fileupload';
 import * as morgan from 'morgan';
 
 import db from './models';
@@ -24,6 +25,7 @@ class App {
         this.app.use(cors());
         this.app.use(validator());
         this.app.use(morgan('dev'));
+        this.app.use(fileUpload());
         this.app.use(auth);
     }
 

@@ -2,17 +2,18 @@ import { ConfirmEmailInstance } from '../../models/ConfirmEmailModel';
 import { IUserController } from './user.interface';
 import { Op, Transaction } from 'sequelize';
 import { Router, Request, Response } from 'express';
+import { TokenResetPasswordInstance } from '../../models/TokenResetPasswordModel';
 import { UserAttributes, UserInstance } from './../../models/UserModel';
 
 import db from '../../models';
 import default_configs from "../../config/default_variables";
 import EnviarEmail from '../../services/send_email';
+import * as mkdirp from 'mkdirp';
 
 import * as HttpStatus from 'http-status-codes';
 import * as jwt from 'jsonwebtoken';
 import * as UIDGenerator from 'uid-generator';
 import * as moment from 'moment';
-import { TokenResetPasswordInstance } from '../../models/TokenResetPasswordModel';
 
 const uidgen = new UIDGenerator();
 class UserController implements IUserController {
@@ -184,14 +185,51 @@ class UserController implements IUserController {
         throw new Error("Method not implemented.");
     }
     atualizar(req: Request, res: Response): void {
-        throw new Error("Method not implemented.");
+        req.checkBody("nome").exists();
+        var errors = req.validationErrors();
+
+        if (errors) {
+            res.status(HttpStatus.BAD_REQUEST).json(errors);
+            return;
+        } else {
+            db.User.findById(req.user.id)
+                .then((user: UserInstance) => {
+                    db.sequelize.transaction((t: Transaction) => {
+                        return user.update({ name: req.body.name }, { transaction: t });
+                    }).then(data => {
+                        res.status(HttpStatus.OK).json({ error: false, mensagem: "Atualizado com sucesso", data: data });
+                    }).catch(err => {
+                        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: true, mensagem: "Falha ao atualizar dados" });
+                    });
+                });
+        }
     }
     atualizarFoto(req: Request, res: Response): void {
-        throw new Error("Method not implemented.");
+        mkdirp('./public/user/avatar', (err) => { });
+
+        if (!req.files) {
+            res.status(HttpStatus.OK).json({ error: true, mensagem: "Sem arquivos para upload" });
+            return;
+        }
+
+        //cria o nome do arquivo
+        let foto = 'avatar_' + req.user.id + '.jpg';
+        let file: any = req.files.imagem; //Pega a imagem do request
+
+        file.mv('./public/user/avatar/' + foto);
+
+        db.sequelize.transaction((t: Transaction) => {
+            return db.User.update({ photo: foto }, { where: { id: req.user.id }, transaction: t })
+        }).then(user => {
+            res.status(HttpStatus.OK).json({ error: false, mensagem: "Atualizado com sucesso" });
+        }).catch(err => {
+            res.status(HttpStatus.OK).json({ error: true, mensagem: "Falha ao atualizar foto de perfil" });
+        });
     }
+
     atualizarSenha(req: Request, res: Response): void {
-        req.checkBody("old_password").exists().isLength({ min: 6, max: 20 });;
-        req.checkBody("password").exists().isLength({ min: 6, max: 20 });;
+        req.checkBody("old_password").exists().isLength({ min: 6, max: 20 });
+        req.checkBody("password").exists().isLength({ min: 6, max: 20 });
         var errors = req.validationErrors();
 
         if (errors) {

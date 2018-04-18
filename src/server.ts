@@ -20,5 +20,4 @@ db.sequelize.sync({ force: false })
         server.on('error', onError(server));
 
         server.on('listening', onListening(server));
-
     });
