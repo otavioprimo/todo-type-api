@@ -17,10 +17,10 @@ import * as moment from 'moment';
 const uidgen = new UIDGenerator();
 class UserController implements IUserController {
 
-    getUsuariosFiltro(req: Request, res: Response): void {
+    getUsuariosFiltro(req, res: Response): void {
         throw new Error("Method not implemented.");
     }
-    getByUsername(req: Request, res: Response): void {
+    getByUsername(req, res: Response): void {
         db.User.findOne({ where: { username: req.params.username }, attributes: { exclude: ['password'] } })
             .then((user: UserInstance) => {
                 if (!user)
@@ -29,13 +29,13 @@ class UserController implements IUserController {
                     res.status(HttpStatus.OK).json({ error: false, data: user });
             });
     }
-    getPerfilById(req: Request, res: Response): void {
+    getPerfilById(req, res: Response): void {
         db.User.findById(req.user.id, { attributes: { exclude: ['password'] } })
             .then((user: UserInstance) => {
                 res.status(HttpStatus.OK).json(user);
             });
     }
-    searchByUsername(req: Request, res: Response): void {
+    searchByUsername(req, res: Response): void {
         req.checkQuery("param").exists();
         req.checkQuery("page").exists().notEmpty();
         req.checkQuery("limit").exists().notEmpty();
@@ -64,7 +64,7 @@ class UserController implements IUserController {
                 });
         }
     }
-    cadastrar(req: Request, res: Response): void {
+    cadastrar(req, res: Response): void {
         req.checkBody("email").exists().isEmail;
         req.checkBody("username").exists();
         req.checkBody("onesignal_id").exists();
@@ -121,7 +121,7 @@ class UserController implements IUserController {
 
         }
     }
-    login(req: Request, res: Response): void {
+    login(req, res: Response): void {
         req.checkBody("email").exists();
         req.checkBody("senha").exists();
         req.checkBody("onesignal_id").exists();
@@ -180,10 +180,10 @@ class UserController implements IUserController {
             }
         }
     }
-    loginGoogle(req: Request, res: Response): void {
+    loginGoogle(req, res: Response): void {
         throw new Error("Method not implemented.");
     }
-    atualizar(req: Request, res: Response): void {
+    atualizar(req, res: Response): void {
         req.checkBody("nome").exists();
         var errors = req.validationErrors();
 
@@ -203,7 +203,7 @@ class UserController implements IUserController {
                 });
         }
     }
-    atualizarFoto(req: Request, res: Response): void {
+    atualizarFoto(req, res: Response): void {
         if (!req.files) {
             res.status(HttpStatus.OK).json({ error: true, mensagem: "Sem arquivos para upload" });
             return;
@@ -224,7 +224,7 @@ class UserController implements IUserController {
         });
     }
 
-    atualizarSenha(req: Request, res: Response): void {
+    atualizarSenha(req, res: Response): void {
         req.checkBody("old_password").exists().isLength({ min: 6, max: 20 });
         req.checkBody("password").exists().isLength({ min: 6, max: 20 });
         var errors = req.validationErrors();
@@ -249,7 +249,7 @@ class UserController implements IUserController {
         }
     }
 
-    atualizarRecuperarSenha(req: Request, res: Response): void {
+    atualizarRecuperarSenha(req, res: Response): void {
         req.checkBody("token").exists();
         req.checkBody("password").exists().isLength({ min: 6, max: 20 });;
         var errors = req.validationErrors();
@@ -282,7 +282,7 @@ class UserController implements IUserController {
         }
     }
 
-    confirmarEmail(req: Request, res: Response): void {
+    confirmarEmail(req, res: Response): void {
         req.checkBody("token").exists();
         var errors = req.validationErrors();
 
@@ -314,7 +314,7 @@ class UserController implements IUserController {
         }
     }
 
-    enviarConfirmarEmail(req: Request, res: Response): void {
+    enviarConfirmarEmail(req, res: Response): void {
         db.User.findById(req.user.id)
             .then((user: UserInstance) => {
 
@@ -332,7 +332,7 @@ class UserController implements IUserController {
             })
     }
 
-    recuperarSenha(req: Request, res: Response): void {
+    recuperarSenha(req, res: Response): void {
         req.checkBody("email").exists().isEmail();
         var errors = req.validationErrors();
 
