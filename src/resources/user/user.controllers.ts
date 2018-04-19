@@ -212,11 +212,13 @@ class UserController implements IUserController {
         //cria o nome do arquivo
         let foto = 'avatar_' + req.user.id + '.jpg';
         let file: any = req.files.imagem; //Pega a imagem do request
+        
+        let path = `http://river-app-com-br.umbler.net/static/user/avatar/${foto}`;
 
         file.mv('./public/user/avatar/' + foto);
 
         db.sequelize.transaction((t: Transaction) => {
-            return db.User.update({ photo: foto }, { where: { id: req.user.id }, transaction: t })
+            return db.User.update({ photo: path }, { where: { id: req.user.id }, transaction: t })
         }).then(user => {
             res.status(HttpStatus.OK).json({ error: false, mensagem: "Atualizado com sucesso" });
         }).catch(err => {

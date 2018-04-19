@@ -86,7 +86,9 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
                         const salt = genSaltSync();
                         user.password = hashSync(user.password, salt);
 
-                        user.photo = `https://api.adorable.io/avatar/80/${user.username}`;
+                        if(!user.changed('photo')){
+                            user.photo = `https://api.adorable.io/avatar/80/${user.username}`;
+                        }
                     },
                     beforeUpdate: (user: UserInstance, options: Sequelize.CreateOptions): void => {
                         if (user.changed('password')) {
