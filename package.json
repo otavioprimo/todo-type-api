@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "set NODE_ENV=production && npm run build &&  node dist/server.js",
+    "start": "NODE_ENV=production && npm run build &&  node dist/server.js",
     "test": "set NODE_ENV=test && npm run build && node dist/server.js",
     "dev": "node_modules/.bin/gulp",
     "build": "node_modules/.bin/gulp --prod"
