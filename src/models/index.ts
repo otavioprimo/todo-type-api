@@ -35,7 +35,7 @@ if (!db) {
 
     db.TokenResetPassword
     db.User
-    db.FriendsList
+    db.FriendList
     db.FriendsInvitation
     db.ConfirmEmail
     db.Task

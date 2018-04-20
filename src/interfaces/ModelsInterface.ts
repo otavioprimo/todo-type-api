@@ -8,7 +8,7 @@ import { TaskModel } from '../models/TasksModel';
 
 export interface ModelsInterface {
     ConfirmEmail: ConfirmEmailModel;
-    FriendList: FriendsListModel;
+    FriendsList: FriendsListModel;
     FriendsInvitation: FriendsInvitationModel;
     Task: TaskModel;
     TokenResetPassword: TokenResetPasswordModel;

@@ -9,8 +9,11 @@ import * as mkdirp from 'mkdirp';
 
 import db from './models';
 import Mail from './services/mail';
-import userRoute from './resources/user/user.routes';
 import auth from './config/auth';
+
+import userRoute from './resources/user/user.routes';
+import invitationRoute from './resources/friend_invitation/friend_invitation.routes';
+
 class App {
 
     public app: express.Application;
@@ -42,7 +45,8 @@ class App {
 
         this.app.use('/static', express.static(path.join(__dirname, '../public')));
         this.app.use('/hello', (req, res) => { res.send("Olá Marilene") });
-        this.app.use('/api/v1/user', userRoute);
+        this.app.use('/v1/user', userRoute);
+        this.app.use('/v1/invitation', invitationRoute);
     }
 }
 

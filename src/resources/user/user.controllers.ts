@@ -36,7 +36,7 @@ class UserController implements IUserController {
             });
     }
     searchByUsername(req, res: Response): void {
-        req.checkQuery("param").exists();
+        req.checkQuery("username").exists();
         req.checkQuery("page").exists().notEmpty();
         req.checkQuery("limit").exists().notEmpty();
         var errors = req.validationErrors();
@@ -50,7 +50,7 @@ class UserController implements IUserController {
             db.User.findAll({
                 where: {
                     username: {
-                        [Op.like]: req.query.param
+                        [Op.like]: `%${req.query.username}%`
                     },
                     status: true
                 },
@@ -212,7 +212,7 @@ class UserController implements IUserController {
         //cria o nome do arquivo
         let foto = 'avatar_' + req.user.id + '.jpg';
         let file: any = req.files.imagem; //Pega a imagem do request
-        
+
         let path = `http://river-app-com-br.umbler.net/static/user/avatar/${foto}`;
 
         file.mv('./public/user/avatar/' + foto);
