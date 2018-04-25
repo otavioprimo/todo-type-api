@@ -62,7 +62,8 @@ export class FriendInvitationController implements IFriendInvitation {
                         return friendInvitation.update({ status: false }, { transaction: t })
                             .then(data => {
                                 if (req.body.status == true) {
-                                    db.FriendsList.create({ user: req.user.id, friend: friendInvitation.friend });
+                                    db.FriendsList.create({ user: req.user.id, friend: friendInvitation.user });
+                                    db.FriendsList.create({ user: friendInvitation.user, friend: req.user.id });
                                 }
                             });
                     }).then(data => {

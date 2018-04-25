@@ -20,13 +20,63 @@ class UserController implements IUserController {
     getUsuariosFiltro(req, res: Response): void {
         throw new Error("Method not implemented.");
     }
-    getByUsername(req, res: Response): void {
-        db.User.findOne({ where: { username: req.params.username }, attributes: { exclude: ['password'] } })
-            .then((user: UserInstance) => {
-                if (!user)
-                    res.status(HttpStatus.NOT_FOUND).json({ error: true, message: 'Usuário não encontrado' });
+    getById(req, res): void {
+        db.User.findById(req.params.id, { attributes: { exclude: ['password', 'status', 'updatedAt', 'createdAt', 'google_id', 'onesignal_id'] } })
+            .then(user => {
+                if (user) {
+                    if (user.id != req.user.id) {
+                        db.FriendsList.findOne({ where: { friend: user.id, user: req.user.id } })
+                            .then((friend) => {
+                                let finalUser: any = {
+                                    id: user.id,
+                                    name: user.name,
+                                    email: user.email,
+                                    username: user.username,
+                                    photo: user.photo
+                                };
+                                if (friend) {
+                                    finalUser.isFriend = true;
+                                } else {
+                                    finalUser.isFriend = false;
+                                }
+                                res.status(HttpStatus.OK).json({ error: false, data: finalUser });
+                            });
+                    } else {
+                        res.status(HttpStatus.OK).json({ error: false, data: user });
+                    }
+                }
                 else
-                    res.status(HttpStatus.OK).json({ error: false, data: user });
+                    res.status(HttpStatus.NOT_FOUND).json({ error: true, message: 'Usuário não encontrado' });
+            });
+    }
+    getByUsername(req, res: Response): void {
+        db.User.findOne({ where: { username: req.params.username }, attributes: { exclude: ['password', 'status', 'updatedAt', 'createdAt', 'google_id', 'onesignal_id'] } })
+            .then((user: any) => {
+                if (user) {
+                    if (user.id != req.user.id) {
+                        db.FriendsList.findOne({ where: { friend: user.id, user: req.user.id } })
+                            .then((friend) => {
+                                let finalUser: any = {
+                                    id: user.id,
+                                    name: user.name,
+                                    email: user.email,
+                                    username: user.username,
+                                    photo: user.photo
+                                };
+                                if (friend) {
+                                    finalUser.isFriend = true;
+                                } else {
+                                    finalUser.isFriend = false;
+                                }
+
+                                res.status(HttpStatus.OK).json({ error: false, data: finalUser });
+                            });
+                    } else {
+                        res.status(HttpStatus.OK).json({ error: false, data: user });
+                    }
+                }
+                else
+                    res.status(HttpStatus.NOT_FOUND).json({ error: true, message: 'Usuário não encontrado' });
             });
     }
     getPerfilById(req, res: Response): void {
@@ -45,18 +95,20 @@ class UserController implements IUserController {
             res.status(HttpStatus.BAD_REQUEST).json(errors);
             return;
         } else {
-            let page = Number(req.query.page) - 1;
+            let offset = (Number(req.query.page) - 1) * Number(req.query.limit);
 
             db.User.findAll({
                 where: {
                     username: {
                         [Op.like]: `%${req.query.username}%`
                     },
-                    status: true
+                    id: { 
+                        [Op.ne]: req.user.id 
+                    }
                 },
                 attributes: { exclude: ['password'] },
-                order: ['name', 'DESC'],
-                offset: Number(page),
+                order: ['name'],
+                offset: Number(offset),
                 limit: Number(req.query.limit)
             })
                 .then((user: UserInstance[]) => {
@@ -72,15 +124,15 @@ class UserController implements IUserController {
         req.checkBody("senha").exists().isLength({ min: 6, max: 20 });
         var errors = req.validationErrors();
 
-        if (!isUsername(req.body.username)) {
-            res.status(HttpStatus.BAD_REQUEST).json({ erro: true, mensagem: "username com formato inválido" });
-            return;
-        }
-
         if (errors) {
             res.status(HttpStatus.BAD_REQUEST).json(errors);
             return;
         } else {
+
+            if (!isUsername(req.body.username)) {
+                res.status(HttpStatus.BAD_REQUEST).json({ erro: true, mensagem: "username com formato inválido" });
+                return;
+            }
 
             //Verifica se o username já existe
             db.User.findOne({ where: { username: req.body.username } }).then(hasUser => {

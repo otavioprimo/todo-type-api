@@ -46,7 +46,7 @@ class App {
         this.app.use('/static', express.static(path.join(__dirname, '../public')));
         this.app.use('/hello', (req, res) => { res.send("Olá Marilene") });
         this.app.use('/v1/user', userRoute);
-        this.app.use('/v1/invitation', invitationRoute);
+        this.app.use('/v1/invite', invitationRoute);
     }
 }
 

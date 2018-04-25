@@ -4,9 +4,10 @@ import tokenRequired from '../authRoute';
 
 const router: Router = Router();
 
-router.get('/perfil', tokenRequired, UserController.getPerfilById);
+router.get('/', tokenRequired, UserController.getPerfilById);
 router.get('/:username', tokenRequired, UserController.getByUsername);
 router.get('/search/username', tokenRequired, UserController.searchByUsername);
+router.get('/id/:id', tokenRequired, UserController.getById);
 
 router.post('/', UserController.cadastrar)
 router.post('/login', UserController.login);

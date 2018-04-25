@@ -1,10 +1,10 @@
 {
     "development": {
-      "username": "root",
-      "password": "5886630",
-      "database": "lista_tarefas_development",
-      "host": "localhost",
-      "port":"3306",
+      "username": "otavioprimo",
+      "password": "6m5nxxk4",
+      "database": "river_production",
+      "host": "mysql762.umbler.com",
+      "port":"41890",
       "dialect": "mysql"
     },
     "test": {

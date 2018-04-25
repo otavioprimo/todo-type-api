@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "start": "node dist/server.js",
-    "test": "NODE_ENV=test && node dist/server.js",
+    "test": "set NODE_ENV=test && node dist/server.js",
     "dev": "node_modules/.bin/gulp",
     "build": "node_modules/.bin/gulp --prod"
   },
