@@ -89,7 +89,7 @@ export class FriendInvitationController implements IFriendInvitation {
             let offset = page * req.query.limit;
 
             db.sequelize.query(`
-                select a.id, a.message, a.status, a.friend, b.name, b.photo,b.username
+                select a.id, a.message, a.status, a.friend, b.name,b.username,b.photo_url
                 from friends_invitation a
                 left join users b ON a.friend = b.id
                 where a.friend = ${req.user.id}

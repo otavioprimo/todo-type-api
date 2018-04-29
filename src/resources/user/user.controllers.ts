@@ -21,7 +21,7 @@ class UserController implements IUserController {
         throw new Error("Method not implemented.");
     }
     getById(req, res): void {
-        db.User.findById(req.params.id, { attributes: { exclude: ['password', 'status', 'updatedAt', 'createdAt', 'google_id', 'onesignal_id'] } })
+        db.User.findById(req.params.id, { attributes: { exclude: ['photo_base64', 'password', 'status', 'updatedAt', 'createdAt', 'google_id', 'onesignal_id'] } })
             .then(user => {
                 if (user) {
                     if (user.id != req.user.id) {
@@ -32,7 +32,7 @@ class UserController implements IUserController {
                                     name: user.name,
                                     email: user.email,
                                     username: user.username,
-                                    photo: user.photo
+                                    photo_url: user.photo_url
                                 };
                                 if (friend) {
                                     finalUser.isFriend = true;
@@ -50,7 +50,7 @@ class UserController implements IUserController {
             });
     }
     getByUsername(req, res: Response): void {
-        db.User.findOne({ where: { username: req.params.username }, attributes: { exclude: ['password', 'status', 'updatedAt', 'createdAt', 'google_id', 'onesignal_id'] } })
+        db.User.findOne({ where: { username: req.params.username }, attributes: { exclude: ['photo_base64', 'password', 'status', 'updatedAt', 'createdAt', 'google_id', 'onesignal_id'] } })
             .then((user: any) => {
                 if (user) {
                     if (user.id != req.user.id) {
@@ -80,9 +80,26 @@ class UserController implements IUserController {
             });
     }
     getPerfilById(req, res: Response): void {
-        db.User.findById(req.user.id, { attributes: { exclude: ['password'] } })
+        db.User.findById(req.user.id, { attributes: { exclude: ['photo_base64', 'password'] } })
             .then((user: UserInstance) => {
                 res.status(HttpStatus.OK).json(user);
+            });
+    }
+    convertBase64toUrl(req, res: Response): void {
+        db.User.findOne({ where: { username: req.params.username }, attributes: { exclude: ['password'] } })
+            .then((user: UserInstance) => {
+                if (user) {
+                    let foto = `data:image/png;base64,${user.photo_base64}`;
+                    var img = new Buffer(foto, 'base64');
+
+                    res.writeHead(200, {
+                        'Content-Type': 'image/png',
+                        'Content-Length': img.length
+                    });
+                    res.end(img);
+                } else {
+                    res.status(HttpStatus.NOT_FOUND).send();
+                }
             });
     }
     searchByUsername(req, res: Response): void {
@@ -102,11 +119,11 @@ class UserController implements IUserController {
                     username: {
                         [Op.like]: `%${req.query.username}%`
                     },
-                    id: { 
-                        [Op.ne]: req.user.id 
+                    id: {
+                        [Op.ne]: req.user.id
                     }
                 },
-                attributes: { exclude: ['password'] },
+                attributes: { exclude: ['photo_base64', 'password'] },
                 order: ['name'],
                 offset: Number(offset),
                 limit: Number(req.query.limit)
@@ -135,12 +152,12 @@ class UserController implements IUserController {
             }
 
             //Verifica se o username já existe
-            db.User.findOne({ where: { username: req.body.username } }).then(hasUser => {
+            db.User.findOne({ where: { username: req.body.username }, attributes: { exclude: ['photo_base64'] } }).then(hasUser => {
                 if (hasUser)
                     res.status(HttpStatus.BAD_REQUEST).json({ erro: true, mensagem: "Usuário já existe" });
                 else {
                     //Verifica se o email já existe
-                    db.User.findOne({ where: { email: req.body.email } }).then(hasEmail => {
+                    db.User.findOne({ where: { email: req.body.email }, attributes: { exclude: ['photo_base64'] } }).then(hasEmail => {
                         if (hasEmail)
                             res.status(HttpStatus.BAD_REQUEST).json({ erro: true, mensagem: "Usuário já existe" });
                         else {
@@ -160,7 +177,7 @@ class UserController implements IUserController {
                                     db.ConfirmEmail.create({ user: user.id, token: token_email })
 
                                     //Envia o token de resposta
-                                    var token = jwt.sign({ id: user.id, email: user.email }, default_configs.jwt_token, {
+                                    var token = jwt.sign({ id: user.id, email: user.email, username: user.username }, default_configs.jwt_token, {
                                         expiresIn: '360d'
                                     });
                                     res.status(HttpStatus.OK).json({ error: false, token: token });
@@ -189,7 +206,7 @@ class UserController implements IUserController {
 
             //Faz Login com email
             if (isEmail) {
-                db.User.find({ where: { email: req.body.email } })
+                db.User.find({ where: { email: req.body.email }, attributes: { exclude: ['photo_base64'] } })
                     .then((user: UserInstance) => {
                         if (user) {
                             let isPassword = user.isPassword(user.password, req.body.senha);
@@ -198,7 +215,7 @@ class UserController implements IUserController {
                                 db.sequelize.transaction((t: Transaction) => {
                                     return user.update({ onesignal_id: req.body.onesignal_id }, { transaction: t });
                                 });
-                                var token = jwt.sign({ id: user.id, email: user.email }, default_configs.jwt_token, {
+                                var token = jwt.sign({ id: user.id, email: user.email, username: user.username }, default_configs.jwt_token, {
                                     expiresIn: '360d'
                                 });
                                 res.status(HttpStatus.OK).json({ error: false, token: token });
@@ -212,13 +229,13 @@ class UserController implements IUserController {
                         }
                     });
             } else {//Faz Login com username
-                db.User.find({ where: { username: req.body.email } })
+                db.User.find({ where: { username: req.body.email }, attributes: { exclude: ['photo_base64'] } })
                     .then((user: UserInstance) => {
                         if (user) {
                             let isPassword = user.isPassword(user.password, req.body.senha);
                             if (isPassword) {
                                 user.update({ onesignal_id: req.body.onesignal_id });
-                                var token = jwt.sign({ id: user.id, email: user.email }, default_configs.jwt_token, {
+                                var token = jwt.sign({ id: user.id, email: user.email, username: user.username }, default_configs.jwt_token, {
                                     expiresIn: '360d'
                                 });
                                 res.status(HttpStatus.OK).json({ error: false, token: token });
@@ -243,7 +260,7 @@ class UserController implements IUserController {
             res.status(HttpStatus.BAD_REQUEST).json(errors);
             return;
         } else {
-            db.User.findById(req.user.id)
+            db.User.findById(req.user.id, { attributes: { exclude: ['photo_base64'] } })
                 .then((user: UserInstance) => {
                     db.sequelize.transaction((t: Transaction) => {
                         return user.update({ name: req.body.name }, { transaction: t });
@@ -270,11 +287,15 @@ class UserController implements IUserController {
         file.mv('./public/user/avatar/' + foto);
 
         db.sequelize.transaction((t: Transaction) => {
-            return db.User.update({ photo: path }, { where: { id: req.user.id }, transaction: t })
+            return db.User.update({
+                photo_url: path
+                // photo_base64: req.files.imagem.data,
+                // photo_url: req.protocol + '://' + req.get('host') + '/v1/user/foto/' + req.user.username
+            }, { where: { id: req.user.id }, transaction: t })
         }).then(user => {
             res.status(HttpStatus.OK).json({ error: false, mensagem: "Atualizado com sucesso" });
         }).catch(err => {
-            res.status(HttpStatus.OK).json({ error: true, mensagem: "Falha ao atualizar foto de perfil" });
+            res.status(HttpStatus.OK).json({ error: true, mensagem: "Falha ao atualizar foto de perfil", msg_err: err });
         });
     }
 
@@ -287,7 +308,7 @@ class UserController implements IUserController {
             res.status(HttpStatus.BAD_REQUEST).json(errors);
             return;
         } else {
-            db.User.findById(req.user.id)
+            db.User.findById(req.user.id, { attributes: { exclude: ['photo_base64'] } })
                 .then((user: UserInstance) => {
                     let isPassword = user.isPassword(user.password, req.body.old_password);
                     if (isPassword) {
@@ -369,7 +390,7 @@ class UserController implements IUserController {
     }
 
     enviarConfirmarEmail(req, res: Response): void {
-        db.User.findById(req.user.id)
+        db.User.findById(req.user.id, { attributes: { exclude: ['photo_base64'] } })
             .then((user: UserInstance) => {
 
                 uidgen.generate().then(token_email => {
@@ -394,7 +415,7 @@ class UserController implements IUserController {
             res.status(HttpStatus.BAD_REQUEST).json(errors);
             return;
         } else {
-            db.User.findOne({ where: { email: req.body.email } })
+            db.User.findOne({ where: { email: req.body.email }, attributes: { exclude: ['photo_base64'] } })
                 .then((user: UserInstance) => {
                     if (user) {
                         uidgen.generate().then(token => {

@@ -11,7 +11,8 @@ export interface UserAttributes {
     username?: string;
     password?: string;
     email_confirmed?: boolean;
-    photo?: string;
+    photo_base64?: string;
+    photo_url?: string;
     status?: boolean;
     onesignal_id?: string;
     google_id?: string;
@@ -61,8 +62,13 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
                     notEmpty: true
                 }
             },
-            photo: {
-                type: DataTypes.TEXT,
+            photo_base64: {
+                type: DataTypes.BLOB('medium'),
+                allowNull: true,
+                defaultValue: null
+            },
+            photo_url: {
+                type: DataTypes.STRING,
                 allowNull: true,
                 defaultValue: null
             },
@@ -86,14 +92,22 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
                         const salt = genSaltSync();
                         user.password = hashSync(user.password, salt);
 
-                        if(!user.changed('photo')){
-                            user.photo = `https://api.adorable.io/avatar/80/${user.username}`;
+                        if (!user.changed('photo')) {
+                            user.photo_url = `https://api.adorable.io/avatar/80/${user.username}`;
                         }
                     },
                     beforeUpdate: (user: UserInstance, options: Sequelize.CreateOptions): void => {
                         if (user.changed('password')) {
                             const salt = genSaltSync();
                             user.password = hashSync(user.password, salt);
+                        }
+                    },
+                    afterFind: (user: UserInstance, options: Sequelize.CreateOptions): void => {
+                        if (user) {
+                            if (user.photo_base64) {
+                                user.photo_base64 = new Buffer(user.photo_base64).toString('base64');
+
+                            }
                         }
                     }
                 }

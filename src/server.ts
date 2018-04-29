@@ -12,7 +12,7 @@ const server = http.createServer(app);
 const port = normalizePort(process.env.port || 3000);
 
 //Delete All Tabled and Create Again | Only for Development
-let deleteTables = env.trim() === 'development' ? true : false;
+// let deleteTables = env.trim() === 'development' ? true : false;
 
 db.sequelize.sync({ force: false })
     .then(() => {
