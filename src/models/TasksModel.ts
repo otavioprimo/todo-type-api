@@ -1,12 +1,10 @@
 import { TaskModel } from './TasksModel';
 import * as Sequelize from 'sequelize';
 import * as uuid from 'uuid/v4';
-import * as UIDGenerator from 'uid-generator';
+import * as randtoken from 'rand-token';
 
 import { BaseModelInterface } from './../interfaces/BaseModelInterface';
 import { ModelsInterface } from '../interfaces/ModelsInterface';
-
-const uidgen = new UIDGenerator();
 
 export interface TaskAttributes {
     id?: number;
@@ -16,7 +14,6 @@ export interface TaskAttributes {
     message?: string;
     shared_token?: string;
     public_id?: string;
-    isList?: boolean;
     status?: boolean;
     private?: boolean;
     expiration?: string;
@@ -67,43 +64,14 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
             private: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
-                defaultValue: 1
-            },
-            isList: {
-                type: DataTypes.BOOLEAN,
-                allowNull: false,
-                defaultValue: 0
+                defaultValue: false
             }
         }, {
                 tableName: 'tasks',
                 hooks: {
                     beforeCreate: (task: TaskInstance, options: Sequelize.CreateOptions): void => {
-                        const Op = Sequelize.Op;
-
-                        let _public_id: string;
-                        let _shared_token: string;
-                        let canExit: boolean = false;
-
-                        do {
-                            uidgen.generate()
-                                .then(token => {
-                                    _public_id = token
-                                    _shared_token = uuid();
-
-                                    let task = Task.find({
-                                        where: {
-                                            [Op.or]: [{ public_id: _public_id }, { shared_token: _shared_token }]
-                                        }
-                                    });
-
-                                    if (!task) {
-                                        canExit = true;
-                                    }
-                                });
-                        } while (!canExit);
-
-                        task.public_id = _public_id;
-                        task.shared_token = _shared_token;
+                        task.shared_token = uuid();
+                        task.public_id = randtoken.generate(30);
                     }
                 }
             });

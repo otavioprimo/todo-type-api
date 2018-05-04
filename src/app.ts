@@ -14,6 +14,7 @@ import auth from './config/auth';
 import userRoute from './resources/user/user.routes';
 import invitationRoute from './resources/friend_invitation/friend_invitation.routes';
 import friendListRoute from './resources/friend_list/friend_list.routes';
+import tasksRoute from './resources/tasks/tasks.routes';
 class App {
 
     public app: express.Application;
@@ -48,6 +49,7 @@ class App {
         this.app.use('/v1/user', userRoute);
         this.app.use('/v1/invite', invitationRoute);
         this.app.use('/v1/friend-list', friendListRoute);
+        this.app.use('/v1/task',tasksRoute);
     }
 }
 
