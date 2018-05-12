@@ -50,8 +50,85 @@ class TasksController implements ITask {
         }
     }
     alterar(req: any, res: any): void {
-        throw new Error("Method not implemented.");
+        req.checkBody("id").exists().notEmpty();
+        req.checkBody("titulo").exists().notEmpty();
+        req.checkBody("descricao").exists().notEmpty();
+        req.checkBody("expiracao").exists();
+
+        var errors = req.validationErrors();
+
+        if (errors) {
+            res.status(HttpStatus.BAD_REQUEST).json(errors);
+            return;
+        } else {
+            db.Task.findById(req.params.id)
+                .then((task: TaskInstance) => {
+                    db.sequelize.transaction((t: Transaction) => {
+                        return task.update({
+                            titulo: req.body.titulo,
+                            descricao: req.body.descricao,
+                            expiracao: req.body.expiracao
+                        }, { transaction: t });
+                    }).then((data: TaskInstance) => {
+                        res.status(HttpStatus.OK).json({ error: false, mensagem: "Tarefa atualizada com sucesso" });
+                    }).catch(err => {
+                        console.log(err);
+                        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: true, mensagem: "Falha ao atualizar a tarefa" });
+                    });
+                });
+        }
     }
+
+    alterarLista(req, res): void {
+        req.checkBody("descricao").exists().notEmpty();
+
+        var errors = req.validationErrors();
+
+        if (errors) {
+            res.status(HttpStatus.BAD_REQUEST).json(errors);
+            return;
+        } else {
+            db.TaskCheckList.findById(req.params.id)
+                .then((taskList: TaskCheckListInstance) => {
+                    db.sequelize.transaction((t: Transaction) => {
+                        return taskList.update({
+                            description: req.body.descricao
+                        });
+                    }).then(data => {
+                        res.status(HttpStatus.OK).json({ error: false, mensagem: "Lista da tarefa atualizada com sucesso" });
+                    }).catch(err => {
+                        console.log(err);
+                        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: true, mensagem: "Falha ao atualizar a lista da tarefa" });
+                    });
+                });
+        }
+    }
+
+    checkLista(req, res): void {
+        req.checkBody("value").exists().notEmpty();
+
+        var errors = req.validationErrors();
+
+        if (errors) {
+            res.status(HttpStatus.BAD_REQUEST).json(errors);
+            return;
+        } else {
+            db.TaskCheckList.findById(req.params.id)
+                .then((taskList: TaskCheckListInstance) => {
+                    db.sequelize.transaction((t: Transaction) => {
+                        return taskList.update({
+                            check: req.body.value
+                        });
+                    }).then(data => {
+                        res.status(HttpStatus.OK).json({ error: false, mensagem: "Lista da tarefa atualizada com sucesso" });
+                    }).catch(err => {
+                        console.log(err);
+                        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: true, mensagem: "Falha ao atualizar a lista da tarefa" });
+                    });
+                });
+        }
+    }
+
     deletar(req: any, res: any): void {
         db.Task.findById(req.params.id)
             .then((task: TaskInstance) => {

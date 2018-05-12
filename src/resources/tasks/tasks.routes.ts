@@ -12,8 +12,11 @@ router.get('/:id', tokenRequired, tasksController.buscarPorId);
 
 router.post('/', tokenRequired, tasksController.adicionar);
 
-router.put('/:id', tokenRequired, tasksController.alterar);
+router.put('/lista/check/:id')
+router.put('/lista/:id', tokenRequired, tasksController.alterarLista);
+router.put('/:id', tokenRequired, tasksController.checkLista);
 
 router.delete('/:id', tokenRequired, tasksController.deletar);
+
 
 export default router;
