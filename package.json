@@ -4,14 +4,14 @@
   "description": "",
   "main": "dist/server.js",
   "scripts": {
-    "start": "node dist/server.js",
+    "start": "set NODE_ENV=production && node dist/server.js",
     "test": "set NODE_ENV=test && node dist/server.js",
     "dev": "node_modules/.bin/gulp",
     "build": "node_modules/.bin/gulp --prod"
   },
   "engines": {
     "node": "8.9.1",
-    "npm": "5.5.1"
+    "npm": "6.0.1"
   },
   "keywords": [],
   "author": "",
