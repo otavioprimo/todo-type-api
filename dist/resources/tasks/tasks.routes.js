@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const authRoute_1 = require("../authRoute");
+const tasks_controller_1 = require("./tasks.controller");
+const router = express_1.Router();
+router.get('/', authRoute_1.default, tasks_controller_1.default.buscarTodas);
+router.get('/desginadas-para-usuario', authRoute_1.default, tasks_controller_1.default.buscarDesignadasParaUsuario);
+router.get('/desginadas-pelo-usuario', authRoute_1.default, tasks_controller_1.default.buscarDesignadasPeloUsuario);
+router.get('/:id', authRoute_1.default, tasks_controller_1.default.buscarPorId);
+router.post('/', authRoute_1.default, tasks_controller_1.default.adicionar);
+router.put('/lista/check/:id');
+router.put('/lista/:id', authRoute_1.default, tasks_controller_1.default.alterarLista);
+router.put('/:id', authRoute_1.default, tasks_controller_1.default.checkLista);
+router.delete('/:id', authRoute_1.default, tasks_controller_1.default.deletar);
+exports.default = router;
