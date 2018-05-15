@@ -8,19 +8,19 @@
       "dialect": "mysql"
     },
     "test": {
-      "username": "bbbcab154ef950",
-      "password": "836cba9e",
-      "database": "heroku_9d02ffc51944842",
-      "host": "us-cdbr-iron-east-05.cleardb.net",
-      "port":"3306",
+      "username": "otavioprimo",
+      "password": "6m5nxxk4",
+      "database": "river_production",
+      "host": "mysql986.umbler.com",
+      "port":"41890",
       "dialect": "mysql"
     },
     "production": {
       "username": "otavioprimo",
       "password": "6m5nxxk4",
       "database": "river_production",
-      "host": "mysql762.umbler.com",
-      "port":"41890",
+      "host": "mysql986.umbler.com",
+      "port":"3306",
       "dialect": "mysql"
     }
   }
