@@ -145,21 +145,21 @@ class UserController implements IUserController {
             res.status(HttpStatus.BAD_REQUEST).json(errors);
             return;
         } else {
-
+            
             if (!isUsername(req.body.username)) {
                 res.status(HttpStatus.BAD_REQUEST).json({ erro: true, mensagem: "username com formato inválido" });
                 return;
             }
-
+            
             //Verifica se o username já existe
             db.User.findOne({ where: { username: req.body.username }, attributes: { exclude: ['photo_base64'] } }).then(hasUser => {
                 if (hasUser)
-                    res.status(HttpStatus.BAD_REQUEST).json({ erro: true, mensagem: "Usuário já existe" });
+                    res.status(HttpStatus.OK).json({ erro: true, mensagem: "Usuário já existe" });
                 else {
                     //Verifica se o email já existe
                     db.User.findOne({ where: { email: req.body.email }, attributes: { exclude: ['photo_base64'] } }).then(hasEmail => {
                         if (hasEmail)
-                            res.status(HttpStatus.BAD_REQUEST).json({ erro: true, mensagem: "Usuário já existe" });
+                            res.status(HttpStatus.OK).json({ erro: true, mensagem: "Email já existe" });
                         else {
                             //Cria a conta de usuário
                             db.sequelize.transaction((t: Transaction) => {
@@ -187,7 +187,6 @@ class UserController implements IUserController {
                     });
                 }
             });
-
         }
     }
     login(req, res: Response): void {

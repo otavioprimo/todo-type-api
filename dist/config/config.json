@@ -20,7 +20,7 @@
       "password": "6m5nxxk4",
       "database": "river_production",
       "host": "mysql986.umbler.com",
-      "port":"41890",
+      "port":"3306",
       "dialect": "mysql"
     }
   }

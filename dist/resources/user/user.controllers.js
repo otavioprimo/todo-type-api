@@ -147,12 +147,12 @@ class UserController {
             //Verifica se o username já existe
             models_1.default.User.findOne({ where: { username: req.body.username }, attributes: { exclude: ['photo_base64'] } }).then(hasUser => {
                 if (hasUser)
-                    res.status(HttpStatus.BAD_REQUEST).json({ erro: true, mensagem: "Usuário já existe" });
+                    res.status(HttpStatus.OK).json({ erro: true, mensagem: "Usuário já existe" });
                 else {
                     //Verifica se o email já existe
                     models_1.default.User.findOne({ where: { email: req.body.email }, attributes: { exclude: ['photo_base64'] } }).then(hasEmail => {
                         if (hasEmail)
-                            res.status(HttpStatus.BAD_REQUEST).json({ erro: true, mensagem: "Usuário já existe" });
+                            res.status(HttpStatus.OK).json({ erro: true, mensagem: "Email já existe" });
                         else {
                             //Cria a conta de usuário
                             models_1.default.sequelize.transaction((t) => {
