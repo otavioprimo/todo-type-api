@@ -247,7 +247,7 @@ class UserController {
         throw new Error("Method not implemented.");
     }
     atualizar(req, res) {
-        req.checkBody("nome").exists();
+        req.checkBody("name").exists();
         var errors = req.validationErrors();
         if (errors) {
             res.status(HttpStatus.BAD_REQUEST).json(errors);

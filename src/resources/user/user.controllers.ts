@@ -145,12 +145,12 @@ class UserController implements IUserController {
             res.status(HttpStatus.BAD_REQUEST).json(errors);
             return;
         } else {
-            
+
             if (!isUsername(req.body.username)) {
                 res.status(HttpStatus.BAD_REQUEST).json({ erro: true, mensagem: "username com formato inválido" });
                 return;
             }
-            
+
             //Verifica se o username já existe
             db.User.findOne({ where: { username: req.body.username }, attributes: { exclude: ['photo_base64'] } }).then(hasUser => {
                 if (hasUser)
@@ -252,7 +252,7 @@ class UserController implements IUserController {
         throw new Error("Method not implemented.");
     }
     atualizar(req, res: Response): void {
-        req.checkBody("nome").exists();
+        req.checkBody("name").exists();
         var errors = req.validationErrors();
 
         if (errors) {

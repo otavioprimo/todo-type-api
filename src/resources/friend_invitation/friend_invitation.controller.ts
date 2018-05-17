@@ -92,7 +92,7 @@ export class FriendInvitationController implements IFriendInvitation {
                 select a.id, a.message, a.status, a.friend, b.name,b.username,b.photo_url
                 from friends_invitation a
                 left join users b ON a.friend = b.id
-                where a.friend = ${req.user.id}
+                where a.user = ${req.user.id}
                 and a.status = 1
                 limit ${req.query.limit}
                 offset ${offset}`,
