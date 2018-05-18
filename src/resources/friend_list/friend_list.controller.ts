@@ -39,13 +39,13 @@ class FriendListController implements IFriendList {
             return;
         } else {
             db.FriendsList.find({
-                where: { user: req.user.id, friend: req.body.amigo_id }
+                where: { user: req.user.id, friend: req.params.amigo_id }
             }).then(friend => {
                 if (friend) {
                     db.sequelize.transaction((t: Transaction) => {
                         return friend.destroy({ transaction: t }).then(data => {
                             db.FriendsList.find({
-                                where: { user: req.body.amigo_id, friend: req.user.id }
+                                where: { user: req.params.amigo_id, friend: req.user.id }
                             }).then(friend2 => {
                                 friend2.destroy();
                             })

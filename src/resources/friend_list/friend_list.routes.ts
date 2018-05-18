@@ -7,6 +7,6 @@ const router: Router = Router();
 
 router.get('/', tokenRequired, friendListController.buscarAmigos);
 
-router.delete('/', tokenRequired, friendListController.deletarAmigo);
+router.delete('/:amigo_id', tokenRequired, friendListController.deletarAmigo);
 
 export default router;
