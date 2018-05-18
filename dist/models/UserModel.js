@@ -64,9 +64,9 @@ exports.default = (sequelize, DataTypes) => {
             beforeCreate: (user, options) => {
                 const salt = bcryptjs_1.genSaltSync();
                 user.password = bcryptjs_1.hashSync(user.password, salt);
-                if (!user.changed('photo')) {
-                    user.photo_url = `https://api.adorable.io/avatar/80/${user.username}`;
-                }
+                // if (!user.changed('photo')) {
+                //     user.photo_url = `https://api.adorable.io/avatar/80/${user.username}`;
+                // }
             },
             beforeUpdate: (user, options) => {
                 if (user.changed('password')) {

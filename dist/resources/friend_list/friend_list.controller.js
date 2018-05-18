@@ -35,13 +35,13 @@ class FriendListController {
         }
         else {
             models_1.default.FriendsList.find({
-                where: { user: req.user.id, friend: req.body.amigo_id }
+                where: { user: req.user.id, friend: req.params.amigo_id }
             }).then(friend => {
                 if (friend) {
                     models_1.default.sequelize.transaction((t) => {
                         return friend.destroy({ transaction: t }).then(data => {
                             models_1.default.FriendsList.find({
-                                where: { user: req.body.amigo_id, friend: req.user.id }
+                                where: { user: req.params.amigo_id, friend: req.user.id }
                             }).then(friend2 => {
                                 friend2.destroy();
                             });
