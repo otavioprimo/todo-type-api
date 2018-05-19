@@ -16,6 +16,7 @@ router.put('/lista/check/:id', tokenRequired, tasksController.checkLista)
 router.put('/lista/:id', tokenRequired, tasksController.alterarLista);
 router.put('/:id', tokenRequired, tasksController.alterar);
 
+router.delete('/lista/:id', tokenRequired, tasksController.deletarItemLista);
 router.delete('/:id', tokenRequired, tasksController.deletar);
 
 

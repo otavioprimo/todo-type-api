@@ -6,7 +6,7 @@ import * as HttpStatus from 'http-status-codes';
 
 import db from '../../models';
 import { TaskAttributes, TaskInstance } from '../../models/TasksModel';
-import { TaskCheckListInstance } from '../../models/TaskCheckListModel';
+import { TaskCheckListInstance, TaskCheckListAttributes } from '../../models/TaskCheckListModel';
 
 class TasksController implements ITask {
     adicionar(req: any, res: any): void {
@@ -150,6 +150,28 @@ class TasksController implements ITask {
                 res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: true, mensagem: "Falha ao encontrar a tarefa" });
             })
     }
+
+    deletarItemLista(req: any, res: any): void {
+        db.TaskCheckList.findById(req.params.id)
+            .then((task: TaskCheckListAttributes) => {
+                if (task) {
+                    db.sequelize.transaction((t: Transaction) => {
+                        return db.TaskCheckList.destroy({ where: { id: req.params.id } });
+                    }).then(data => {
+                        res.status(HttpStatus.OK).json({ error: false, mensagem: "Item deletado com sucesso" });
+                    }).catch(err => {
+                        console.log(err);
+                        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: true, mensagem: "Falha ao deletar o item" });
+                    })
+                } else {
+                    res.status(HttpStatus.NOT_FOUND).json({ error: true, mensagem: "Item não encontrado" });
+                }
+            }).catch(err => {
+                console.log(err);
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: true, mensagem: "Falha ao encontrar o item" });
+            })
+    }
+
     buscarTodas(req: any, res: any): void {
         req.checkQuery("page").exists().notEmpty();
         req.checkQuery("limit").exists().notEmpty();
@@ -162,16 +184,9 @@ class TasksController implements ITask {
             return;
         } else {
             db.Task.findAll({
-                where: {
-                    user: req.user.id,
-                    status: true
-                },
-                attributes: {
-                    exclude: ["user", "friend"]
-                },
-                order: [
-                    ['createdAt', 'DESC']
-                ],
+                where: { user: req.user.id, status: true },
+                attributes: { exclude: ["user", "friend"] },
+                order: [['createdAt', 'DESC']],
                 offset: Number(offset),
                 limit: Number(req.query.limit),
                 include: [{ model: db.User, required: false }]
@@ -181,18 +196,20 @@ class TasksController implements ITask {
                 });
         }
     }
+
     buscarPorId(req: any, res: any): void {
         db.Task.findById(req.params.id, {
-            attributes: {
-                exclude: ["user"]
-            },
-            order: [
-                ['createdAt', 'DESC']
-            ],
+            attributes: { exclude: ["user"] },
+            order: [['createdAt', 'DESC']],
             include: [{ model: db.User }]
         })
             .then(data => {
-                res.status(HttpStatus.OK).json(data);
+                db.TaskCheckList.findAll({ where: { task: data.id } })
+                    .then(list => {
+                        let response: any = data.toJSON();
+                        response.list = list;
+                        res.status(HttpStatus.OK).json(response);
+                    });
             });
     }
     buscarDesignadasParaUsuario(req: any, res: any): void {

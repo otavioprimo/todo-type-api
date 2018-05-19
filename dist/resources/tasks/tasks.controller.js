@@ -138,6 +138,27 @@ class TasksController {
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: true, mensagem: "Falha ao encontrar a tarefa" });
         });
     }
+    deletarItemLista(req, res) {
+        models_1.default.TaskCheckList.findById(req.params.id)
+            .then((task) => {
+            if (task) {
+                models_1.default.sequelize.transaction((t) => {
+                    return models_1.default.TaskCheckList.destroy({ where: { id: req.params.id } });
+                }).then(data => {
+                    res.status(HttpStatus.OK).json({ error: false, mensagem: "Item deletado com sucesso" });
+                }).catch(err => {
+                    console.log(err);
+                    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: true, mensagem: "Falha ao deletar o item" });
+                });
+            }
+            else {
+                res.status(HttpStatus.NOT_FOUND).json({ error: true, mensagem: "Item não encontrado" });
+            }
+        }).catch(err => {
+            console.log(err);
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: true, mensagem: "Falha ao encontrar o item" });
+        });
+    }
     buscarTodas(req, res) {
         req.checkQuery("page").exists().notEmpty();
         req.checkQuery("limit").exists().notEmpty();
@@ -149,16 +170,9 @@ class TasksController {
         }
         else {
             models_1.default.Task.findAll({
-                where: {
-                    user: req.user.id,
-                    status: true
-                },
-                attributes: {
-                    exclude: ["user", "friend"]
-                },
-                order: [
-                    ['createdAt', 'DESC']
-                ],
+                where: { user: req.user.id, status: true },
+                attributes: { exclude: ["user", "friend"] },
+                order: [['createdAt', 'DESC']],
                 offset: Number(offset),
                 limit: Number(req.query.limit),
                 include: [{ model: models_1.default.User, required: false }]
@@ -170,16 +184,17 @@ class TasksController {
     }
     buscarPorId(req, res) {
         models_1.default.Task.findById(req.params.id, {
-            attributes: {
-                exclude: ["user"]
-            },
-            order: [
-                ['createdAt', 'DESC']
-            ],
+            attributes: { exclude: ["user"] },
+            order: [['createdAt', 'DESC']],
             include: [{ model: models_1.default.User }]
         })
             .then(data => {
-            res.status(HttpStatus.OK).json(data);
+            models_1.default.TaskCheckList.findAll({ where: { task: data.id } })
+                .then(list => {
+                let response = data.toJSON();
+                response.list = list;
+                res.status(HttpStatus.OK).json(response);
+            });
         });
     }
     buscarDesignadasParaUsuario(req, res) {
