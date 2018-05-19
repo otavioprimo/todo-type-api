@@ -161,7 +161,7 @@ class TasksController {
                 ],
                 offset: Number(offset),
                 limit: Number(req.query.limit),
-                include: [{ model: models_1.default.User }]
+                include: [{ model: models_1.default.User, required: false }]
             })
                 .then(data => {
                 res.status(HttpStatus.OK).json(data);

@@ -174,7 +174,7 @@ class TasksController implements ITask {
                 ],
                 offset: Number(offset),
                 limit: Number(req.query.limit),
-                include: [{ model: db.User }]
+                include: [{ model: db.User, required: false }]
             })
                 .then(data => {
                     res.status(HttpStatus.OK).json(data);
